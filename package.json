@@ -1,0 +1,25 @@
+{
+  "name": "food-delivery",
+  "version": "1.0.0",
+  "description": "Vanilla JS Online Store for food delivery",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IryArkhy/delivery-food.git"
+  },
+  "keywords": [
+    "js",
+    "vanilla",
+    "food-delivery",
+    "javascript"
+  ],
+  "author": "Iryna Arkhypchenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IryArkhy/delivery-food/issues"
+  },
+  "homepage": "https://github.com/IryArkhy/delivery-food#readme"
+}
