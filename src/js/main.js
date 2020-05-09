@@ -20,9 +20,13 @@ const cartButton = document.querySelector("#cart-button"),
   restaurantTitle = document.querySelector('.restaurant-title'),
   rating = document.querySelector('.rating'),
   minPrice = document.querySelector('.price'),
-  category = document.querySelector('.category');
+  category = document.querySelector('.category'),
+  cartBody = document.querySelector('.modal-body'),
+  priceTag = document.querySelector('.modal-pricetag'),
+  clearCart = document.querySelector('.clear-cart');
 
 let login = localStorage.getItem('userLogin');
+const cart = [];
 
 const getData = async (url) => {
   const response = await fetch(url);
@@ -74,6 +78,7 @@ const whenAuthorized = () => {
     authButton.style.display = '';
     userName.style.display = "";
     buttonOut.style.display = "";
+    cartButton.style.display = "";
     buttonOut.removeEventListener("click", logOut);
     checkAuth();
     returnToMain();
@@ -81,7 +86,8 @@ const whenAuthorized = () => {
   userName.textContent = login;
   authButton.style.display = 'none';
   userName.style.display = "inline";
-  buttonOut.style.display = "block";
+  buttonOut.style.display = "flex";
+  cartButton.style.display = "flex";
   buttonOut.addEventListener("click", logOut);
 };
 
@@ -135,11 +141,11 @@ const createGoodCard = (goods) => {
 								</div>
 							</div>
 							<div class="card-buttons">
-								<button class="button button-primary button-add-cart">
+								<button class="button button-primary button-add-cart" id="${id}">
 									<span class="button-card-text">В корзину</span>
 									<span class="button-cart-svg"></span>
 								</button>
-								<strong class="card-price-bold">${price} ₽</strong>
+								<strong class="card-price card-price-bold">${price} ₽</strong>
 							</div>
 						</div>
   `);
@@ -167,17 +173,83 @@ const openGoods = ({ target }) => {
 
 }
 
+const addToCart = ({ target }) => {
+  const btnAddToCart = target.closest('.button-add-cart');
+  if (btnAddToCart) {
+    const card = target.closest('.card');
+    const title = card.querySelector('.card-title-reg').textContent;
+    const price = card.querySelector('.card-price').textContent;
+    const idBtn = btnAddToCart.id;
+    const food = cart.find(el => el.id == idBtn);
+    if (food) return food.count += 1;
+    cart.push({
+
+      id: idBtn, title, price, count: 1
+    });
+
+  }
+};
 
 
+const renderCart = () => {
+  cartBody.textContent = '';
+  cart.forEach(({ id, title, price, count }) => {
+    const itemCart = `
+  <div class="food-row">
+    <span class="food-name">${title}</span>
+    <strong class="food-price">${price}</strong>
+    <div class="food-counter">
+      <button class="counter-button count-minus" data-id="${id}">-</button>
+      <span class="counter">${count}</span>
+      <button class="counter-button count-plus" data-id="${id}">+</button>
+    </div>
+  </div>
+`
+    cartBody.insertAdjacentHTML('afterbegin', itemCart)
+  });
+  const totalPrice = cart.reduce((result, el) => {
+
+    // result += (Number(el.price.split(" ")[0]) * el.count);
+    result += (parseFloat(el.price) * el.count);
+    return result;
+  }, 0);
+  priceTag.textContent = `${totalPrice} ₽`;
+}
+
+const changeCount = ({ target }) => {
+
+  const food = cart.find(el => el.id === target.dataset.id);
+  if (target.classList.contains('counter-button')) {
+    if (target.classList.contains('count-minus')) {
+      food.count--;
+      if (food.count === 0) {
+        cart.splice(cart.indexOf(food), 1);
+      }
+    };
+    if (target.classList.contains('count-plus')) food.count++;
+    renderCart();
+  };
+};
+const emptyCart = () => {
+  cart.length = 0;
+  renderCart();
+}
+const formCart = () => {
+  renderCart()
+  toggleModal();
+}
 
 function init() {
   getData('./db/partners.json').then(data => {
     data.forEach(createCardRestaurant);
   });
-  cartButton.addEventListener("click", toggleModal);
+  cartButton.addEventListener("click", formCart);
   close.addEventListener("click", toggleModal);
   cardsRestaurants.addEventListener('click', openGoods);
   logo.addEventListener('click', returnToMain);
+  cardsMenu.addEventListener('click', addToCart);
+  cartBody.addEventListener('click', changeCount);
+  clearCart.addEventListener('click', emptyCart)
 
   new Swiper('.swiper-container', {
     loop: true,
