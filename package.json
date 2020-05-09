@@ -21,5 +21,6 @@
   "bugs": {
     "url": "https://github.com/IryArkhy/delivery-food/issues"
   },
-  "homepage": "https://github.com/IryArkhy/delivery-food#readme"
+  "homepage": "https://github.com/IryArkhy/delivery-food#readme",
+  "dependencies": {}
 }
